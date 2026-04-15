@@ -1,0 +1,287 @@
+[module]
+name = "sshd_hardening"
+description = "Harden OpenSSH server configuration based on CIS benchmarks"
+version = "0.2.0"
+category = "ssh"
+severity = "critical"
+opinionated = false
+references = ["CIS-5.2"]
+
+[module.supported]
+distros = ["ubuntu", "debian"]
+min_versions = { ubuntu = "22.04", debian = "12" }
+requires_service = "sshd"
+
+# --- Handlers ---
+
+[[handlers]]
+id = "restart-sshd"
+type = "service_restart"
+service = "sshd"
+pre_check = "sshd -t"
+
+# --- Rules ---
+
+[[rules]]
+id = "ssh-protocol-2"
+description = "Ensure SSH protocol is set to 2"
+severity = "critical"
+reference = "CIS-5.2.4"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "Protocol"
+expected = "2"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "Protocol"
+value = "2"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "Protocol"
+expected = "2"
+
+[[rules]]
+id = "ssh-disable-root-login"
+description = "Disable direct root login via SSH"
+severity = "critical"
+reference = "CIS-5.2.10"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "PermitRootLogin"
+expected = "no"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "PermitRootLogin"
+value = "no"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "PermitRootLogin"
+expected = "no"
+
+[[rules]]
+id = "ssh-disable-password-auth"
+description = "Disable password authentication, require key-based auth"
+severity = "critical"
+reference = "CIS-5.2.15"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "PasswordAuthentication"
+expected = "no"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "PasswordAuthentication"
+value = "no"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "PasswordAuthentication"
+expected = "no"
+
+[[rules]]
+id = "ssh-disable-empty-passwords"
+description = "Deny login with empty passwords"
+severity = "critical"
+reference = "CIS-5.2.11"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "PermitEmptyPasswords"
+expected = "no"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "PermitEmptyPasswords"
+value = "no"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "PermitEmptyPasswords"
+expected = "no"
+
+[[rules]]
+id = "ssh-max-auth-tries"
+description = "Limit authentication attempts to 4"
+severity = "high"
+reference = "CIS-5.2.7"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "MaxAuthTries"
+expected = "4"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "MaxAuthTries"
+value = "4"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "MaxAuthTries"
+expected = "4"
+
+[[rules]]
+id = "ssh-disable-x11-forwarding"
+description = "Disable X11 forwarding"
+severity = "high"
+reference = "CIS-5.2.6"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "X11Forwarding"
+expected = "no"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "X11Forwarding"
+value = "no"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "X11Forwarding"
+expected = "no"
+
+[[rules]]
+id = "ssh-disable-tcp-forwarding"
+description = "Disable TCP forwarding"
+severity = "medium"
+reference = "CIS-5.2.20"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "AllowTcpForwarding"
+expected = "no"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "AllowTcpForwarding"
+value = "no"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "AllowTcpForwarding"
+expected = "no"
+
+[[rules]]
+id = "ssh-client-alive-interval"
+description = "Set client alive interval to 300 seconds"
+severity = "medium"
+reference = "CIS-5.2.16"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "ClientAliveInterval"
+expected = "300"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "ClientAliveInterval"
+value = "300"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "ClientAliveInterval"
+expected = "300"
+
+[[rules]]
+id = "ssh-client-alive-count-max"
+description = "Set client alive count max to 3"
+severity = "medium"
+reference = "CIS-5.2.16"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "ClientAliveCountMax"
+expected = "3"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "ClientAliveCountMax"
+value = "3"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "ClientAliveCountMax"
+expected = "3"
+
+[[rules]]
+id = "ssh-login-grace-time"
+description = "Set login grace time to 60 seconds"
+severity = "medium"
+reference = "CIS-5.2.17"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "LoginGraceTime"
+expected = "60"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "LoginGraceTime"
+value = "60"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "LoginGraceTime"
+expected = "60"
+
+[[rules]]
+id = "ssh-log-level-verbose"
+description = "Set SSH log level to VERBOSE for audit trail"
+severity = "medium"
+reference = "CIS-5.2.5"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "LogLevel"
+expected = "VERBOSE"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "LogLevel"
+value = "VERBOSE"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "LogLevel"
+expected = "VERBOSE"
+
+[[rules]]
+id = "ssh-banner"
+description = "Set SSH warning banner"
+severity = "low"
+reference = "CIS-5.2.18"
+notify = ["restart-sshd"]
+[rules.check]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "Banner"
+expected = "/etc/issue.net"
+[rules.remediate]
+type = "set_config_line"
+file = "/etc/ssh/sshd_config"
+key = "Banner"
+value = "/etc/issue.net"
+[rules.verify]
+type = "config_line"
+file = "/etc/ssh/sshd_config"
+key = "Banner"
+expected = "/etc/issue.net"

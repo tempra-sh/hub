@@ -1,0 +1,12 @@
+# Tempra Hub Registry
+# The tempra binary reads this file to find the active channel,
+# then loads the channel file for the list of modules.
+
+[registry]
+version = "0.0.1"
+default_channel = "stable"
+
+[channels]
+stable = "channels/stable.toml"
+# testing = "channels/testing.toml"
+# develop = "channels/develop.toml"

@@ -1,0 +1,28 @@
+# Tempra Hub — Stable Channel
+# Modules listed here are production-ready and tested.
+# SHA256 checksums ensure integrity.
+
+[channel]
+name = "stable"
+updated = "2026-04-15"
+
+[[modules]]
+name = "sshd_hardening"
+version = "0.2.0"
+path = "modules/ssh/sshd_hardening.toml"
+sha256 = "8573c0d83fd94e24cbb364c0ed7f62433391be745a8c3277e70f4837d71dc26e"
+description = "Harden OpenSSH server configuration based on CIS benchmarks"
+
+[[modules]]
+name = "basic_firewall"
+version = "0.2.0"
+path = "modules/firewall/basic_firewall.toml"
+sha256 = "caa3321dfde4e94c1071faaed15e3c0cb4d1b556d9b7b9e5a5a0412aae14525d"
+description = "Setup UFW firewall with secure defaults"
+
+[[modules]]
+name = "fail2ban_setup"
+version = "0.2.0"
+path = "modules/fail2ban/fail2ban_setup.toml"
+sha256 = "5620d41ac070a0f1caca6155efdae577eb9fd4417c120f9a402a7e2d14d2e127"
+description = "Install and configure fail2ban for SSH brute force protection"

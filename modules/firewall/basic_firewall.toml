@@ -1,0 +1,133 @@
+[module]
+name = "basic_firewall"
+description = "Setup UFW firewall with secure defaults"
+version = "0.2.0"
+category = "firewall"
+severity = "critical"
+opinionated = false
+references = ["CIS-3.5"]
+
+[module.supported]
+distros = ["ubuntu", "debian"]
+min_versions = { ubuntu = "22.04", debian = "12" }
+
+# --- Rules (order matters: install → configure → enable) ---
+
+[[rules]]
+id = "fw-install-ufw"
+description = "Ensure UFW is installed"
+severity = "critical"
+reference = "CIS-3.5.1.1"
+[rules.check]
+type = "package"
+name = "ufw"
+expected = "installed"
+[rules.remediate]
+type = "install_package"
+name = "ufw"
+[rules.verify]
+type = "package"
+name = "ufw"
+expected = "installed"
+
+[[rules]]
+id = "fw-default-deny-incoming"
+description = "Set default policy to deny incoming traffic"
+severity = "critical"
+reference = "CIS-3.5.1.2"
+[rules.check]
+type = "command"
+command = "ufw status verbose"
+expected_output = "deny (incoming)"
+[rules.remediate]
+type = "command"
+command = "ufw default deny incoming"
+[rules.verify]
+type = "command"
+command = "ufw status verbose"
+expected_output = "deny (incoming)"
+
+[[rules]]
+id = "fw-default-allow-outgoing"
+description = "Set default policy to allow outgoing traffic"
+severity = "high"
+reference = "CIS-3.5.1.2"
+[rules.check]
+type = "command"
+command = "ufw status verbose"
+expected_output = "allow (outgoing)"
+[rules.remediate]
+type = "command"
+command = "ufw default allow outgoing"
+[rules.verify]
+type = "command"
+command = "ufw status verbose"
+expected_output = "allow (outgoing)"
+
+[[rules]]
+id = "fw-allow-ssh"
+description = "Allow SSH connections (port 22) to prevent lockout"
+severity = "critical"
+reference = "CIS-3.5.1.4"
+[rules.check]
+type = "command"
+command = "ufw status"
+expected_output = "22/tcp"
+[rules.remediate]
+type = "command"
+command = "ufw allow 22/tcp"
+[rules.verify]
+type = "command"
+command = "ufw status"
+expected_output = "22/tcp"
+
+[[rules]]
+id = "fw-rate-limit-ssh"
+description = "Rate limit SSH connections to mitigate brute force"
+severity = "high"
+reference = "CIS-3.5.1.4"
+[rules.check]
+type = "command"
+command = "ufw status"
+expected_output = "LIMIT"
+[rules.remediate]
+type = "command"
+command = "ufw limit 22/tcp"
+[rules.verify]
+type = "command"
+command = "ufw status"
+expected_output = "LIMIT"
+
+[[rules]]
+id = "fw-enable-logging"
+description = "Enable UFW logging for audit trail"
+severity = "medium"
+reference = "CIS-3.5.1.3"
+[rules.check]
+type = "command"
+command = "ufw status verbose"
+expected_output = "Logging: on"
+[rules.remediate]
+type = "command"
+command = "ufw logging on"
+[rules.verify]
+type = "command"
+command = "ufw status verbose"
+expected_output = "Logging: on"
+
+[[rules]]
+id = "fw-enable"
+description = "Enable UFW firewall"
+severity = "critical"
+reference = "CIS-3.5.1.1"
+[rules.check]
+type = "command"
+command = "ufw status"
+expected_output = "Status: active"
+[rules.remediate]
+type = "command"
+command = "echo y | ufw enable"
+[rules.verify]
+type = "command"
+command = "ufw status"
+expected_output = "Status: active"

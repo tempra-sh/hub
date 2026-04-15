@@ -1,0 +1,148 @@
+[module]
+name = "fail2ban_setup"
+description = "Install and configure fail2ban for SSH brute force protection"
+version = "0.2.0"
+category = "fail2ban"
+severity = "high"
+opinionated = false
+references = ["CIS-5.2", "NIST-AC-7"]
+
+[module.supported]
+distros = ["ubuntu", "debian"]
+min_versions = { ubuntu = "22.04", debian = "12" }
+
+# --- Handlers ---
+
+[[handlers]]
+id = "restart-fail2ban"
+type = "service_restart"
+service = "fail2ban"
+
+# --- Rules ---
+
+[[rules]]
+id = "f2b-install"
+description = "Ensure fail2ban is installed"
+severity = "high"
+reference = "CIS-5.2"
+[rules.check]
+type = "package"
+name = "fail2ban"
+expected = "installed"
+[rules.remediate]
+type = "install_package"
+name = "fail2ban"
+[rules.verify]
+type = "package"
+name = "fail2ban"
+expected = "installed"
+
+[[rules]]
+id = "f2b-service-enabled"
+description = "Ensure fail2ban service is enabled and running"
+severity = "high"
+reference = "CIS-5.2"
+[rules.check]
+type = "service_state"
+service = "fail2ban"
+expected = "enabled"
+[rules.remediate]
+type = "set_service_state"
+service = "fail2ban"
+state = "enabled"
+[rules.verify]
+type = "service_state"
+service = "fail2ban"
+expected = "enabled"
+
+[[rules]]
+id = "f2b-default-banaction"
+description = "Set default ban action to ufw"
+severity = "high"
+reference = "CIS-5.2"
+notify = ["restart-fail2ban"]
+[rules.check]
+type = "ini_value"
+file = "/etc/fail2ban/jail.local"
+section = "DEFAULT"
+key = "banaction"
+expected = "ufw"
+[rules.remediate]
+type = "set_ini_value"
+file = "/etc/fail2ban/jail.local"
+section = "DEFAULT"
+key = "banaction"
+value = "ufw"
+[rules.remediate.section_defaults]
+bantime = "3600"
+findtime = "600"
+maxretry = "5"
+[rules.verify]
+type = "ini_value"
+file = "/etc/fail2ban/jail.local"
+section = "DEFAULT"
+key = "banaction"
+expected = "ufw"
+
+[[rules]]
+id = "f2b-sshd-jail-enabled"
+description = "Enable fail2ban SSH jail (5 attempts, 10min window, 1h ban)"
+severity = "high"
+reference = "NIST-AC-7"
+notify = ["restart-fail2ban"]
+[rules.check]
+type = "ini_value"
+file = "/etc/fail2ban/jail.local"
+section = "sshd"
+key = "enabled"
+expected = "true"
+[rules.remediate]
+type = "set_ini_value"
+file = "/etc/fail2ban/jail.local"
+section = "sshd"
+key = "enabled"
+value = "true"
+[rules.remediate.section_defaults]
+port = "ssh"
+filter = "sshd"
+logpath = "/var/log/auth.log"
+maxretry = "5"
+findtime = "600"
+bantime = "3600"
+[rules.verify]
+type = "ini_value"
+file = "/etc/fail2ban/jail.local"
+section = "sshd"
+key = "enabled"
+expected = "true"
+
+[[rules]]
+id = "f2b-recidive-jail"
+description = "Enable recidive jail to ban repeat offenders for 7 days"
+severity = "medium"
+reference = "NIST-AC-7"
+notify = ["restart-fail2ban"]
+[rules.check]
+type = "ini_value"
+file = "/etc/fail2ban/jail.local"
+section = "recidive"
+key = "enabled"
+expected = "true"
+[rules.remediate]
+type = "set_ini_value"
+file = "/etc/fail2ban/jail.local"
+section = "recidive"
+key = "enabled"
+value = "true"
+[rules.remediate.section_defaults]
+logpath = "/var/log/fail2ban.log"
+banaction = "ufw"
+bantime = "604800"
+findtime = "86400"
+maxretry = "3"
+[rules.verify]
+type = "ini_value"
+file = "/etc/fail2ban/jail.local"
+section = "recidive"
+key = "enabled"
+expected = "true"
