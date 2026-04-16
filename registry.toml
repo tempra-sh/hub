@@ -3,7 +3,7 @@
 # then loads the channel file for the list of modules.
 
 [registry]
-version = "0.0.1"
+schema_version = "1"
 default_channel = "stable"
 
 [channels]

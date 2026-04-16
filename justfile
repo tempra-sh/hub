@@ -39,21 +39,27 @@ checksums:
 
 # ==================== Git helpers ====================
 
-# Sign all commits on current branch
+# Sign unsigned commits since origin/main
 sign-commits:
     #!/usr/bin/env bash
     set -euo pipefail
-    UPSTREAM=$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || echo "")
-    if [[ -z "${UPSTREAM}" ]]; then
-        echo "No upstream branch — signing all commits from root"
-        git rebase --exec 'git commit --amend -S --no-edit' --root
-    else
-        DIVERGE=$(git merge-base HEAD "${UPSTREAM}")
-        COUNT=$(git rev-list --count "${DIVERGE}..HEAD")
-        echo "Signing ${COUNT} commit(s) since ${DIVERGE}"
-        git rebase --exec 'git commit --amend -S --no-edit' "${DIVERGE}"
+
+    UPSTREAM="origin/main"
+
+    UNSIGNED=$(git log --format='%H %G?' "${UPSTREAM}..HEAD" 2>/dev/null | grep -v ' G$' | grep -v ' U$' | wc -l)
+
+    if [[ "$UNSIGNED" -eq 0 ]]; then
+        echo "All commits since ${UPSTREAM} are already signed."
+        exit 0
     fi
-    echo "All commits signed."
+
+    echo "Signing ${UNSIGNED} commit(s) since ${UPSTREAM}..."
+    git rebase --exec 'git commit --amend -S --no-edit' "${UPSTREAM}"
+    echo "Done."
+
+# Sign and force-push in one step
+sign-and-push: sign-commits
+    git push --force-with-lease
 
 # ==================== Release ====================
 

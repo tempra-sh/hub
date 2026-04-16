@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.0.2
+
+### Changes
+- Per-version OS defaults in stable channel (`[[defaults]]` array format)
+- Each distro+version combo gets its own default module list
+- `registry.toml` uses `schema_version` instead of ambiguous `version`
+
 ## v0.0.1
 
 ### Modules

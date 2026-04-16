@@ -4,7 +4,34 @@
 
 [channel]
 name = "stable"
-updated = "2026-04-15"
+updated = "2026-04-16"
+
+# --- Default modules per OS/version ---
+# Each entry defines which modules are enabled by default for a specific
+# distro + version combination. The binary matches on exact version.
+# If no match, falls back to same distro without version, then to all modules.
+
+[[defaults]]
+distro = "ubuntu"
+version = "24.04"
+modules = ["sshd_hardening", "basic_firewall", "fail2ban_setup"]
+
+[[defaults]]
+distro = "ubuntu"
+version = "22.04"
+modules = ["sshd_hardening", "basic_firewall", "fail2ban_setup"]
+
+[[defaults]]
+distro = "debian"
+version = "12"
+modules = ["sshd_hardening", "basic_firewall", "fail2ban_setup"]
+
+[[defaults]]
+distro = "debian"
+version = "13"
+modules = ["sshd_hardening", "basic_firewall", "fail2ban_setup"]
+
+# --- Module catalog ---
 
 [[modules]]
 name = "sshd_hardening"
